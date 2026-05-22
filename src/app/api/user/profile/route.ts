@@ -53,10 +53,10 @@ export async function GET(req: Request) {
 
     // Night Owl logic check: item added/reviewed between 11 PM and 5 AM
     const hasNightActivity = [
-      ...user.reviews.map(r => r.createdAt),
-      ...user.watchlist.map(w => w.addedAt),
-      ...user.loginLogs.map(l => l.loggedInAt)
-    ].some(date => {
+      ...user.reviews.map((r: any) => r.createdAt),
+      ...user.watchlist.map((w: any) => w.addedAt),
+      ...user.loginLogs.map((l: any) => l.loggedInAt)
+    ].some((date: any) => {
       const hours = new Date(date).getHours();
       return hours >= 23 || hours <= 5;
     });
@@ -123,23 +123,23 @@ export async function GET(req: Request) {
 
     // Combine recent actions into a unified timeline
     const activityTimeline = [
-      ...user.reviews.map(r => ({
+      ...user.reviews.map((r: any) => ({
         type: "review",
         text: `Reviewed media (Rating: ${r.rating}/10)`,
         date: r.createdAt,
       })),
-      ...user.watchlist.map(w => ({
+      ...user.watchlist.map((w: any) => ({
         type: "watchlist",
         text: `Added "${w.title}" to Watchlist`,
         date: w.addedAt,
       })),
-      ...user.loginLogs.map(l => ({
+      ...user.loginLogs.map((l: any) => ({
         type: "login",
         text: "Logged in to StreamAura",
         date: l.loggedInAt,
       }))
     ]
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, 10); // Return top 10 activities
 
     return NextResponse.json({
