@@ -49,7 +49,10 @@ export async function POST(req: Request) {
       `Password reset link requested for ${email.toLowerCase()} (${name})`
     );
 
-    const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/reset-password?token=${token}`;
+    const host = req.headers.get("host") || "";
+    const protocol = req.headers.get("x-forwarded-proto") || "http";
+    const origin = req.headers.get("origin") || (host ? `${protocol}://${host}` : process.env.NEXTAUTH_URL) || "http://localhost:3000";
+    const resetUrl = `${origin}/reset-password?token=${token}`;
 
     // Check if real Resend API Key is set up
     const resendApiKey = process.env.RESEND_API_KEY;
