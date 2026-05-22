@@ -1,0 +1,25 @@
+[
+  {
+    "id": "user_1779098815664_7p8l9eh764d",
+    "name": "Nisha",
+    "email": "alimaaz1501@gmail.com",
+    "passwordHash": "$2b$12$lPl.0m0RhdK40h.Rzc6TLegA/kjXHyTCkGusge/dkl/16GogzTeDW",
+    "image": null,
+    "createdAt": "2026-05-18T10:06:55.664Z",
+    "password": "$2b$10$IH703QtRqIeZS11Xd8004.IpLHxXxIzGyybZg1uDD7Og07ELaFqvO"
+  },
+  {
+    "id": "zvghziy6r",
+    "name": "Alimo",
+    "email": "alimo@example.com",
+    "password": "$2b$10$kEo67Tew5WLYQZxE2pfcAOBAot83of480sKT0XwJSWQRmxPd2zx8K",
+    "image": "https://api.dicebear.com/7.x/adventurer/svg?seed=Alimo"
+  },
+  {
+    "id": "0zg2j3pb2",
+    "name": "JOHN DEOO",
+    "email": "akhtermaazali@gmail.com",
+    "password": "$2b$10$lNPppSU3uEcDYW4uX7261eitCq4GBJL.3Rkv//qmXV2Yq038lhlMq",
+    "image": "https://api.dicebear.com/7.x/adventurer/svg?seed=JOHN%20DEOO"
+  }
+]

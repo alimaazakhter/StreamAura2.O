@@ -1,0 +1,229 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { Eye, EyeOff, Mail, Lock, User, AlertCircle, Loader2 } from "lucide-react";
+
+export default function SignupPage() {
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      // 1. Register the user
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to create account");
+      }
+
+      // 2. Sign the user in automatically
+      const res = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (res?.error) {
+        setError("Account created, but auto-login failed. Please sign in manually.");
+      } else {
+        router.push("/");
+        router.refresh();
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "An unexpected error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: string) => {
+    setError(null);
+    setSocialLoading(provider);
+    try {
+      await signIn(provider, { callbackUrl: "/" });
+    } catch (err) {
+      console.error(err);
+      setError(`Failed to sign in with ${provider}`);
+      setSocialLoading(null);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 pt-20 pb-12 relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-bg-primary via-bg-elevated to-bg-primary" />
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute top-20 right-10 w-72 h-72 bg-accent/20 rounded-full blur-[120px]" />
+        <div className="absolute bottom-20 left-10 w-96 h-96 bg-blue-600/15 rounded-full blur-[150px]" />
+      </div>
+
+      {/* Card */}
+      <div className="relative w-full max-w-md glass rounded-3xl p-8 sm:p-10 animate-fade-in-scale">
+        <div className="text-center mb-8">
+          <Link href="/">
+            <Image
+              src="/logo-v5.png"
+              alt="StreamAura"
+              width={160}
+              height={45}
+              className="h-10 w-auto mx-auto mb-4"
+            />
+          </Link>
+          <h1 className="text-2xl font-bold text-white">Create Account</h1>
+          <p className="text-text-secondary text-sm mt-1">Join StreamAura for free</p>
+        </div>
+
+        {/* Error Notification */}
+        {error && (
+          <div className="mb-6 p-4 bg-rating-red/10 border border-rating-red/20 rounded-xl flex items-center gap-3 text-rating-red text-sm animate-shake">
+            <AlertCircle size={18} className="shrink-0" />
+            <p>{error}</p>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2">
+              Full Name
+            </label>
+            <div className="relative">
+              <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="John Doe"
+                className="w-full pl-12 pr-4 py-3.5 bg-bg-card border border-border rounded-xl text-white placeholder-text-muted focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all"
+                required
+                disabled={loading || !!socialLoading}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2">
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full pl-12 pr-4 py-3.5 bg-bg-card border border-border rounded-xl text-white placeholder-text-muted focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all"
+                required
+                disabled={loading || !!socialLoading}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-text-secondary mb-2">
+              Password
+            </label>
+            <div className="relative">
+              <Lock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted" />
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Min. 8 characters"
+                className="w-full pl-12 pr-12 py-3.5 bg-bg-card border border-border rounded-xl text-white placeholder-text-muted focus:outline-none focus:border-accent/50 focus:ring-2 focus:ring-accent/20 transition-all"
+                required
+                minLength={8}
+                disabled={loading || !!socialLoading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-text-muted hover:text-white transition-colors"
+                disabled={loading || !!socialLoading}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2 text-sm">
+            <input type="checkbox" className="mt-1 w-4 h-4 rounded border-border bg-bg-card accent-accent" required />
+            <span className="text-text-secondary">
+              I agree to the{" "}
+              <a href="#" className="text-accent hover:text-accent-hover">Terms of Service</a> and{" "}
+              <a href="#" className="text-accent hover:text-accent-hover">Privacy Policy</a>
+            </span>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading || !!socialLoading}
+            className="w-full py-3.5 bg-accent hover:bg-accent-hover text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-lg hover:shadow-accent/30 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+          >
+            {loading ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Creating Account...
+              </>
+            ) : (
+              "Create Account"
+            )}
+          </button>
+        </form>
+
+        <div className="flex items-center gap-4 my-6">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-text-muted text-xs uppercase tracking-wider">or</span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleSocialLogin("google")}
+            disabled={loading || !!socialLoading}
+            className="flex-1 flex items-center justify-center gap-2 py-3 glass glass-hover rounded-xl text-sm text-text-secondary hover:text-white transition-all disabled:opacity-50"
+          >
+            {socialLoading === "google" ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+            )}
+            Google
+          </button>
+        </div>
+
+        <p className="text-center text-text-secondary text-sm mt-6">
+          Already have an account?{" "}
+          <Link href="/login" className="text-accent hover:text-accent-hover font-medium transition-colors">
+            Sign In
+          </Link>
+        </p>
+      </div>
+    </div>
+  );
+}
