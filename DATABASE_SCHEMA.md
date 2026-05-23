@@ -1,4 +1,4 @@
-# 🗄️ StreamAura 2.O — Database Schema & Architecture
+<img width="1195" height="1316" alt="ChatGPT Image May 23, 2026, 03_04_27 PM" src="https://github.com/user-attachments/assets/36629cec-f441-415a-89c6-4096711263d3" /># 🗄️ StreamAura 2.O — Database Schema & Architecture
 
 This document provides a detailed breakdown of the PostgreSQL database schema managed by Prisma ORM.
 
