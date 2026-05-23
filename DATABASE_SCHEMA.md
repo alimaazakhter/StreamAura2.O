@@ -6,6 +6,8 @@ This document provides a detailed breakdown of the PostgreSQL database schema ma
 
 ## 🗺️ 1. Entity-Relationship Diagram (ERD)
 
+![StreamAura Database ER Diagram](file:///c:/Users/alimo/OneDrive/Desktop/Project----Streaming-platform-main/streamaura2.O/public/stream_aura_er_diagram.png)
+
 This diagram outlines how tables link to each other. Relational tables are connected to the central `User` entity, while standalone log/submission tables track telemetry and support queries.
 
 ```mermaid
